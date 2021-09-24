@@ -5,7 +5,9 @@ using UnityEngine;
 public class BreadthFirstSearch : MonoBehaviour
 {
     [SerializeField]
-    public GameObject ball;
+    public GameObject ball, mouse;
+    public float moveSpeed;
+    float timer = 0.0f;
     
     int mazeWidth = 22;
     int mazeDepth = 19;
@@ -68,22 +70,20 @@ public class BreadthFirstSearch : MonoBehaviour
     }
 
     Queue<Location> frontier = new Queue<Location>();
-    Dictionary<Location, Location> cameFrom = new Dictionary<Location, Location>();
+    List<Location> path = new List<Location>();
     Location currentPos;
-
-    //destino
-    //montar caminho de trás pra frente
 
     public void Start(){
 
         Location posStart = new Location(0, 1);
         Location posTarget = new Location(18, 20);
+        Dictionary<Location, Location> cameFrom = new Dictionary<Location, Location>();
         frontier.Enqueue(posStart);
 
         while(frontier.Count != 0){
 
             currentPos = frontier.Dequeue();
-        // Debug.Log(currentPos);
+            // Debug.Log(currentPos);
             Queue<Location> neighbours = new Queue<Location>();
 
             //check neighbors
@@ -117,8 +117,7 @@ public class BreadthFirstSearch : MonoBehaviour
                 }
             }
         }
-
-        List<Location> path = new List<Location>();
+        
         currentPos = posTarget;
 
         while(currentPos != posStart) {
@@ -129,9 +128,20 @@ public class BreadthFirstSearch : MonoBehaviour
         path.Reverse();
 
         foreach (Location pos in path) {
-            Debug.Log(pos);
+            //Debug.Log(pos);
             Instantiate(ball, new Vector3(pos.y * 2, 5, -pos.x * 2), Quaternion.identity);
         }
 
+    }
+
+    public void Update(){
+        float delta = Time.deltaTime;
+        timer += delta/** moveSpeed*/;
+        Location target = path[(int)timer];
+
+          //  if(timer > 0)
+                mouse.transform.position = Vector3.MoveTowards(mouse.transform.position, new Vector3(target.x, 0.71f, target.y), delta);
+                Debug.Log(mouse.transform.position);
+          // }
     }
 }
